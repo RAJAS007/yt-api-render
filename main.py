@@ -18,14 +18,28 @@ def cleanup_file(path: str):
 @app.get("/download")
 async def download_video(url: str, type: str = "video", background_tasks: BackgroundTasks = None):
     try:
+        # These options make the request look like a real mobile user
         ydl_opts = {
             'outtmpl': 'downloads/%(title)s.%(ext)s',
             'format': 'bestvideo+bestaudio/best' if type == "video" else 'bestaudio/best',
             'merge_output_format': 'mp4',
             'quiet': True,
+            # Use the Android client to bypass age-gates and some bot checks
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web'],
+                    'player_skip': ['configs', 'js'],
+                }
+            },
+            # Spoof User-Agent to look like a standard browser
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Sec-Fetch-Mode': 'navigate',
+            }
         }
         
-        # Audio specific settings
         if type == "audio":
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
@@ -44,7 +58,8 @@ async def download_video(url: str, type: str = "video", background_tasks: Backgr
         return FileResponse(path=filename, filename=os.path.basename(filename))
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # If this fails, the only remaining option is using cookies
+        raise HTTPException(status_code=500, detail=f"YouTube Blocked the Request: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=10000)
