@@ -1,8 +1,8 @@
 # Use Python 3.9
 FROM python:3.9-slim
 
-# Install FFmpeg (Required for merging video/audio)
-RUN apt-get update && apt-get install -y ffmpeg
+# Install FFmpeg AND Git (Git is required to install the latest yt-dlp)
+RUN apt-get update && apt-get install -y ffmpeg git
 
 # Set up the app
 WORKDIR /app
