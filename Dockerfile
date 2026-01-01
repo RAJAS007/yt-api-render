@@ -1,7 +1,7 @@
-# Use Python 3.9
-FROM python:3.9-slim
+# Use the latest Python 3.13
+FROM python:3.13-slim
 
-# Install FFmpeg AND Git (Git is required to install the latest yt-dlp)
+# Install FFmpeg and Git (Required for yt-dlp)
 RUN apt-get update && apt-get install -y ffmpeg git
 
 # Set up the app
