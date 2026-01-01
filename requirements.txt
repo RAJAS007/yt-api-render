@@ -1,3 +1,4 @@
 fastapi
 uvicorn
-yt-dlp
+# This installs the absolute latest version from GitHub
+git+https://github.com/yt-dlp/yt-dlp.git@master
